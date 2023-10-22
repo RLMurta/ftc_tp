@@ -9,14 +9,14 @@ class ChomskyNormalForm:
     def cfg_to_cnf(self):
         new_rules = self.__new_starting_symbol(self.rules)
         print(new_rules)
-        new_rules = self.__remove_non_solitary_terminals(new_rules)
+        new_rules = self.__remove_rules_with_non_solitary_terminals(new_rules)
         print(new_rules)
         while self.__there_is_rules_whith_more_than_two_non_terminals(new_rules):
-            new_rules = self.__remove_more_than_two_non_terminals(new_rules)
+            new_rules = self.__remove_rules_with_more_than_two_non_terminals(new_rules)
         print(new_rules)
-        # new_rules = self.__remove_epsilon(new_rules)
-        # print(new_rules)
-        # new_rules = self.__remove_unitary(new_rules)
+        new_rules = self.__remove_epsilon_rules(new_rules)
+        print(new_rules)
+        # new_rules = self.__remove_unitary_variable_rules(new_rules)
         # print(new_rules)
         return new_rules
     
@@ -39,7 +39,7 @@ class ChomskyNormalForm:
         new_rules.update(rules)
         return new_rules
 
-    def __remove_non_solitary_terminals(self, rules):
+    def __remove_rules_with_non_solitary_terminals(self, rules):
         new_rules = dict()
         for variable in rules:
             new_rules[variable] = rules[variable]
@@ -64,7 +64,7 @@ class ChomskyNormalForm:
                     return True
         return False
     
-    def __remove_more_than_two_non_terminals(self, rules):
+    def __remove_rules_with_more_than_two_non_terminals(self, rules):
         new_rules = dict()
         for variable in rules:
             new_rules[variable] = rules[variable]
@@ -82,10 +82,22 @@ class ChomskyNormalForm:
                     new_rules[new_variable] = [new_variable_rule]
         return new_rules
 
-    def __remove_epsilon(self, rules):
-        pass
+    def __remove_epsilon_rules(self, rules):
+        new_rules = rules
+        for variable in rules:
+            for rule in rules[variable]:
+                if rule == 'ε':
+                    new_rules[variable].remove(rule)
+                    for variable2 in rules:
+                        for rule2 in rules[variable2]:
+                            if variable in rule2:
+                                if variable2 in new_rules:
+                                    new_rules[variable2].append(rule2.replace(variable, ''))
+                                else:
+                                    new_rules[variable2] = [rule2.replace(variable, '')]
+        return new_rules
 
-    def __remove_unitary(self, rules):
+    def __remove_unitary_variable_rules(self, rules):
         pass
 
 
