@@ -16,8 +16,8 @@ class ChomskyNormalForm:
         print(new_rules)
         new_rules = self.__remove_epsilon_rules(new_rules)
         print(new_rules)
-        # new_rules = self.__remove_unitary_variable_rules(new_rules)
-        # print(new_rules)
+        new_rules = self.__remove_unitary_variable_rules(new_rules)
+        print(new_rules)
         return new_rules
     
     def __remove_used_variables_from_available_variables(self):
@@ -44,11 +44,11 @@ class ChomskyNormalForm:
         for variable in rules:
             new_rules[variable] = rules[variable]
             for rule in rules[variable]:
-                if len(rule) > 1 and rule.islower() is False and rule.isupper() is False:
+                if len(rule) > 1 and ((rule.islower() is False and rule.isupper() is False) or (rule.isalpha() is False)):
                     new_rules[variable].remove(rule)
                     new_rule = ''
                     for i in range(len(rule)):
-                        if rule[i].islower():
+                        if rule[i].isupper() is False:
                             new_variable = self.__get_a_variable()
                             new_rules[new_variable] = [rule[i]]
                             new_rule += new_variable
@@ -98,7 +98,16 @@ class ChomskyNormalForm:
         return new_rules
 
     def __remove_unitary_variable_rules(self, rules):
-        pass
+        new_rules = rules
+        for variable in rules:
+            for rule in rules[variable]:
+                if len(rule) == 1 and rule.isupper():
+                    new_rules[variable].remove(rule)
+                    for variable2 in rules:
+                        if variable2 == rule:
+                            for rule2 in rules[variable2]:
+                                new_rules[variable].append(rule2)
+        return new_rules
 
 
 class SecondNormalForm:

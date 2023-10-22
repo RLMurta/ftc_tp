@@ -1,4 +1,0 @@
-S -> ABC
-A -> AA | a
-B -> b
-C -> ε | ab | AbCa
