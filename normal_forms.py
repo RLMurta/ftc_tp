@@ -18,6 +18,8 @@ class ChomskyNormalForm:
         print(new_rules)
         new_rules = self.__remove_unitary_variable_rules(new_rules)
         print(new_rules)
+        new_rules = self.__remove_initial_rule(new_rules)
+        print(new_rules)
         return new_rules
     
     def __remove_used_variables_from_available_variables(self):
@@ -107,6 +109,12 @@ class ChomskyNormalForm:
                         if variable2 == rule:
                             for rule2 in rules[variable2]:
                                 new_rules[variable].append(rule2)
+        return new_rules
+    
+    def __remove_initial_rule(self, rules):
+        new_rules = rules
+        if rules[self.starting_symbol] == rules['S0']:
+            new_rules.pop('S0')
         return new_rules
 
 
