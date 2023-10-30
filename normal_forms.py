@@ -11,12 +11,13 @@ class ChomskyNormalForm:
         print(new_rules)
         new_rules = self.__remove_rules_with_non_solitary_terminals(new_rules)
         print(new_rules)
-        while self.__there_is_rules_whith_more_than_two_non_terminals(new_rules):
+        while self.__is_there_rules_with_more_than_two_non_terminals(new_rules):
             new_rules = self.__remove_rules_with_more_than_two_non_terminals(new_rules)
         print(new_rules)
         new_rules = self.__remove_epsilon_rules(new_rules)
         print(new_rules)
-        new_rules = self.__remove_unitary_variable_rules(new_rules)
+        while self.__is_there_unitary_variable_rules(new_rules):
+            new_rules = self.__remove_unitary_variable_rules(new_rules)
         print(new_rules)
         new_rules = self.__remove_initial_rule(new_rules)
         print(new_rules)
@@ -46,7 +47,7 @@ class ChomskyNormalForm:
         for variable in rules:
             new_rules[variable] = rules[variable]
             for rule in rules[variable]:
-                if len(rule) > 1 and ((rule.islower() is False and rule.isupper() is False) or (rule.isalpha() is False)):
+                if len(rule) > 1 and ((rule.islower() is False and rule.isupper() is False) or (rule.isalpha() is False) or (rule.islower())):
                     new_rules[variable].remove(rule)
                     new_rule = ''
                     for i in range(len(rule)):
@@ -59,7 +60,7 @@ class ChomskyNormalForm:
                     new_rules[variable].append(new_rule)
         return new_rules
     
-    def __there_is_rules_whith_more_than_two_non_terminals(self, rules):
+    def __is_there_rules_with_more_than_two_non_terminals(self, rules):
         for variable in rules:
             for rule in rules[variable]:
                 if len(rule) > 2 and rule.isupper():
@@ -98,6 +99,13 @@ class ChomskyNormalForm:
                                 else:
                                     new_rules[variable2] = [rule2.replace(variable, '')]
         return new_rules
+
+    def __is_there_unitary_variable_rules(self, rules):
+        for variable in rules:
+            for rule in rules[variable]:
+                if len(rule) == 1 and rule.isupper():
+                    return True
+        return False
 
     def __remove_unitary_variable_rules(self, rules):
         new_rules = rules
