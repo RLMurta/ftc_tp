@@ -1,30 +1,26 @@
+import methods
+
 class ChomskyNormalForm:
-    def __init__(self, rules):
+    def __init__(self):
         # ASCII code for A-Z
         self.available_variables = [chr(i) for i in range(65, 91)]
-        self.rules = rules
-        self.__remove_used_variables_from_available_variables()
-        self.starting_symbol = list(self.rules.keys())[0]
 
-    def cfg_to_cnf(self):
-        new_rules = self.__new_starting_symbol(self.rules)
-        print(new_rules)
+    def cfg_to_cnf(self, rules):
+        self.__remove_used_variables_from_available_variables(rules)
+        self.starting_symbol = list(rules.keys())[0]
+
+        new_rules = self.__new_starting_symbol(methods.copy_dict(rules))
         new_rules = self.__remove_rules_with_non_solitary_terminals(new_rules)
-        print(new_rules)
         while self.__is_there_rules_with_more_than_two_non_terminals(new_rules):
             new_rules = self.__remove_rules_with_more_than_two_non_terminals(new_rules)
-        print(new_rules)
         new_rules = self.__remove_epsilon_rules(new_rules)
-        print(new_rules)
         while self.__is_there_unitary_variable_rules(new_rules):
             new_rules = self.__remove_unitary_variable_rules(new_rules)
-        print(new_rules)
         new_rules = self.__remove_initial_rule(new_rules)
-        print(new_rules)
         return new_rules
     
-    def __remove_used_variables_from_available_variables(self):
-        for variable in self.rules:
+    def __remove_used_variables_from_available_variables(self,rules):
+        for variable in rules:
             if variable in self.available_variables:
                 self.available_variables.remove(variable)
 
@@ -127,8 +123,59 @@ class ChomskyNormalForm:
 
 
 class SecondNormalForm:
-    def __init__(self, rules):
-        self.rules = rules
+    def __init__(self):
+        self.available_variables = [chr(i) for i in range(65, 91)]
 
-    def cfg_to_2nf(self):
-        pass
+    def cfg_to_2nf(self, rules):
+        self.__remove_used_variables_from_available_variables(rules)
+        self.starting_symbol = list(rules.keys())[0]
+        new_rules = self.__remove_rules_with_more_than_two_non_terminals(methods.copy_dict(rules))
+        new_rules = self.__remove_epsilon_rules(new_rules)
+        return new_rules
+        
+
+    def __remove_used_variables_from_available_variables(self, rules):
+        for variable in rules:
+            if variable in self.available_variables:
+                self.available_variables.remove(variable)
+
+    def __get_a_variable(self):
+        if len(self.available_variables) > 0:
+            variable = self.available_variables[0]
+            self.available_variables.remove(variable)
+            return variable
+        else:
+            return None
+    
+    def __remove_rules_with_more_than_two_non_terminals(self, rules):
+        new_rules = dict()
+        for variable in rules:
+            new_rules[variable] = rules[variable]
+            for rule in rules[variable]:
+                if len(rule) > 2:
+                    new_rules[variable].remove(rule)
+                    new_rule = ''
+                    new_rule += rule[0]
+                    new_variable = self.__get_a_variable()
+                    new_rule += new_variable
+                    new_rules[variable].append(new_rule)
+                    new_variable_rule = ''
+                    for i in range(1,len(rule)):
+                        new_variable_rule += rule[i]
+                    new_rules[new_variable] = [new_variable_rule]
+        return new_rules
+    
+    def __remove_epsilon_rules(self, rules):
+        new_rules = rules
+        for variable in rules:
+            for rule in rules[variable]:
+                if rule == 'ε':
+                    new_rules[variable].remove(rule)
+                    for variable2 in rules:
+                        for rule2 in rules[variable2]:
+                            if variable in rule2:
+                                if variable2 in new_rules:
+                                    new_rules[variable2].append(rule2.replace(variable, ''))
+                                else:
+                                    new_rules[variable2] = [rule2.replace(variable, '')]
+        return new_rules
