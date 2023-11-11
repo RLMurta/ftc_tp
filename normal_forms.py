@@ -130,6 +130,7 @@ class SecondNormalForm:
         self.__remove_used_variables_from_available_variables(rules)
         self.starting_symbol = list(rules.keys())[0]
         new_rules = self.__remove_rules_with_more_than_two_non_terminals(methods.copy_dict(rules))
+        print(self.nullable(new_rules))
         new_rules = self.__remove_epsilon_rules(new_rules)
         return new_rules
         
@@ -179,3 +180,42 @@ class SecondNormalForm:
                                 else:
                                     new_rules[variable2] = [rule2.replace(variable, '')]
         return new_rules
+    
+    def nullable(self, rules):
+        nullable = set()
+        todo = set()
+        occurs = {A: set() for A in rules}
+
+        for A in rules:
+            for rule in rules[A]:
+                if (len(rule) == 1 and rule.isupper() and rule.isalpha()):  # A -> B
+                    B = rule[0]
+                    occurs[B].add(A)
+                elif (len(rule) == 2 and rule.isupper() and rule.isalpha()):  # A -> BC
+                    B, C = rule
+                    occurs[B].add((A, C))
+                    occurs[C].add((A, B))
+
+        for A in rules:
+            for rule in rules[A]:
+                if rule == 'ε':  # A -> ε
+                    nullable.add(A)
+                    todo.add(A)
+
+        while todo:
+            B = todo.pop()
+            # for AC in occurs[B]:
+
+            for AC in occurs[B]:
+                if isinstance(AC, tuple):
+                    A, C = AC
+                    if C in nullable and A not in nullable:
+                        nullable.add(A)
+                        todo.add(A)
+                else:  # AC is actually A
+                    A = AC
+                    if A not in nullable:
+                        nullable.add(A)
+                        todo.add(A)
+
+        return nullable
