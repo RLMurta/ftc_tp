@@ -4,23 +4,27 @@ from algorithms import Cyk, ModifiedCyk
 import methods
 import time
 
+# Carrega as regras do arquivo de gramática
 cnf_file = ReadFile('cfg_file.cnf')
 rules = methods.copy_dict(cnf_file.rules)
 
+# Converte para a Forma Normal de Chomsky
 chomsky_normal_form_start_time = time.time()
 chomsky_normal_form = ChomskyNormalForm().cfg_to_cnf(rules)
 print(Cyk.run(chomsky_normal_form, '(a0 + b) * a'))
 chomsky_normal_form_total_time = time.time() - chomsky_normal_form_start_time
-print(f'Chomsky Normal Form:{chomsky_normal_form}')
+print(f'Chomsky Normal Form: {chomsky_normal_form}')
 
+# Restaura as regras originais para a próxima transformação
 rules = cnf_file.rules.copy()
+
+# Converte para a Segunda Forma Normal
 second_normal_form_start_time = time.time()
 second_normal_form = SecondNormalForm().cfg_to_2nf(rules)
-print(ModifiedCyk().run(second_normal_form, '(a0 + b) * a'))
+#print(ModifiedCyk().run(second_normal_form, '(a0 + b) * a'))   #ta dando pau
 second_normal_form_total_time = time.time() - second_normal_form_start_time
-print(f'Second Normal Form:{second_normal_form}')
+print(f'Second Normal Form: {second_normal_form}')
 
+# Exibe os tempos de execução
 print('Chomsky Normal Form Time: ', round(chomsky_normal_form_total_time, 5))
 print('Second Normal Form Time: ', round(second_normal_form_total_time, 5))
-
-

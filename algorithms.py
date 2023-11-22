@@ -3,17 +3,29 @@ import matplotlib.pyplot as plt
 
 class Cyk:
     def run(rules, input):
+        """
+        Executa o algoritmo CYK para verificar se a gramática gera a entrada fornecida.
+
+        Args:
+            rules (dict): As regras da gramática.
+            input (str): A entrada a ser verificada.
+
+        Returns:
+            bool: True se a gramática gera a entrada, False caso contrário.
+        """
         input = input.replace(" ", "")
         starting_symbol = list(rules.keys())[0]
         n = len(input)
         table = [[set() for _ in range(n - i)] for i in range(n)]
 
+        # Preenche a tabela para o primeiro caractere da entrada
         for i in range(n):
             for variable in rules:
                 for rule in rules[variable]:
                     if input[i] in rule:
                         table[i][0].add(variable)
 
+        # Preenche a tabela para os caracteres subsequentes
         for j in range(1, n):
             for i in range(n - j):
                 for k in range(j):
@@ -23,12 +35,22 @@ class Cyk:
                                 table[i][j].add(variable)
 
         return starting_symbol in table[0][n - 1]
-    
+
 class ModifiedCyk:
     def __init__(self):
         pass
 
     def run(self, rules, input):
+        """
+        Executa o algoritmo CYK modificado para verificar se a gramática gera a entrada fornecida.
+
+        Args:
+            rules (dict): As regras da gramática.
+            input (str): A entrada a ser verificada.
+
+        Returns:
+            bool: True se a gramática gera a entrada, False caso contrário.
+        """
         input = input.replace(" ", "")
         starting_symbol = list(rules.keys())[0]
         inverse_unit_graph = self.__inverse_unit_graph(rules)
@@ -36,9 +58,11 @@ class ModifiedCyk:
         table = [[set() for _ in range(n)] for i in range(n)]
         star_table = [[set() for _ in range(n)] for i in range(n)]
 
+        # Preenche a tabela para substrings de comprimento 1
         for i in range(n):
             table[i][i] = list(nx.dfs_edges(inverse_unit_graph, input[i]))
 
+        # Preenche a tabela para substrings de comprimento maior que 1
         for j in range(2, n):
             for i in range(j-1,1,-1):
                 table[i][j] = list()
@@ -54,6 +78,15 @@ class ModifiedCyk:
         return starting_symbol in table[0][n - 1]
     
     def __inverse_unit_graph(self, rules):
+        """
+        Cria e retorna o grafo inverso das regras unitárias.
+
+        Args:
+            rules (dict): As regras da gramática.
+
+        Returns:
+            networkx.Graph: O grafo inverso das regras unitárias.
+        """
         graph = nx.Graph()
         for variable in rules:
             graph.add_node(variable)

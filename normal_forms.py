@@ -6,6 +6,15 @@ class ChomskyNormalForm:
         self.available_variables = [chr(i) for i in range(65, 91)]
 
     def cfg_to_cnf(self, rules):
+        """
+        Converte as regras da gramática para a Forma Normal de Chomsky.
+
+        Args:
+            rules (dict): As regras da gramática.
+
+        Returns:
+            dict: As regras convertidas para a Forma Normal de Chomsky.
+        """
         self.__remove_used_variables_from_available_variables(rules)
         self.starting_symbol = list(rules.keys())[0]
 
@@ -19,7 +28,7 @@ class ChomskyNormalForm:
         new_rules = self.__remove_initial_rule(new_rules)
         return new_rules
     
-    def __remove_used_variables_from_available_variables(self,rules):
+    def __remove_used_variables_from_available_variables(self, rules):
         for variable in rules:
             if variable in self.available_variables:
                 self.available_variables.remove(variable)
@@ -76,7 +85,7 @@ class ChomskyNormalForm:
                     new_rule += new_variable
                     new_rules[variable].append(new_rule)
                     new_variable_rule = ''
-                    for i in range(1,len(rule)):
+                    for i in range(1, len(rule)):
                         new_variable_rule += rule[i]
                     new_rules[new_variable] = [new_variable_rule]
         return new_rules
@@ -127,6 +136,15 @@ class SecondNormalForm:
         self.available_variables = [chr(i) for i in range(65, 91)]
 
     def cfg_to_2nf(self, rules):
+        """
+        Converte as regras da gramática para a Segunda Forma Normal.
+
+        Args:
+            rules (dict): As regras da gramática.
+
+        Returns:
+            dict: As regras convertidas para a Segunda Forma Normal.
+        """
         self.__remove_used_variables_from_available_variables(rules)
         self.starting_symbol = list(rules.keys())[0]
         new_rules = self.__remove_rules_with_more_than_two_non_terminals(methods.copy_dict(rules))
@@ -161,7 +179,7 @@ class SecondNormalForm:
                     new_rule += new_variable
                     new_rules[variable].append(new_rule)
                     new_variable_rule = ''
-                    for i in range(1,len(rule)):
+                    for i in range(1, len(rule)):
                         new_variable_rule += rule[i]
                     new_rules[new_variable] = [new_variable_rule]
         return new_rules
@@ -182,6 +200,15 @@ class SecondNormalForm:
         return new_rules
     
     def nullable(self, rules):
+        """
+        Verifica as variáveis nulas da gramática.
+
+        Args:
+            rules (dict): As regras da gramática.
+
+        Returns:
+            set: Um conjunto de variáveis nulas.
+        """
         nullable = set()
         todo = set()
         occurs = {A: set() for A in rules}
@@ -204,7 +231,6 @@ class SecondNormalForm:
 
         while todo:
             B = todo.pop()
-            # for AC in occurs[B]:
 
             for AC in occurs[B]:
                 if isinstance(AC, tuple):
