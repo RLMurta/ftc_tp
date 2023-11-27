@@ -149,7 +149,6 @@ class SecondNormalForm:
         self.starting_symbol = list(rules.keys())[0]
         new_rules = self.__remove_rules_with_more_than_two_non_terminals(methods.copy_dict(rules))
         print(self.nullable(new_rules))
-        new_rules = self.__remove_epsilon_rules(new_rules)
         return new_rules
         
 
@@ -184,21 +183,6 @@ class SecondNormalForm:
                     new_rules[new_variable] = [new_variable_rule]
         return new_rules
     
-    def __remove_epsilon_rules(self, rules):
-        new_rules = rules
-        for variable in rules:
-            for rule in rules[variable]:
-                if rule == 'ε':
-                    new_rules[variable].remove(rule)
-                    for variable2 in rules:
-                        for rule2 in rules[variable2]:
-                            if variable in rule2:
-                                if variable2 in new_rules:
-                                    new_rules[variable2].append(rule2.replace(variable, ''))
-                                else:
-                                    new_rules[variable2] = [rule2.replace(variable, '')]
-        return new_rules
-    
     def nullable(self, rules):
         """
         Verifica as variáveis nulas da gramática.
@@ -222,10 +206,7 @@ class SecondNormalForm:
                     B, C = rule
                     occurs[B].add((A, C))
                     occurs[C].add((A, B))
-
-        for A in rules:
-            for rule in rules[A]:
-                if rule == 'ε':  # A -> ε
+                elif (len(rule) == 1 and rule == 'ε'):  # A -> ε
                     nullable.add(A)
                     todo.add(A)
 

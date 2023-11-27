@@ -31,7 +31,7 @@ class Cyk:
                 for k in range(j):
                     for variable in rules:
                         for rule in rules[variable]:
-                            if rule[0] in table[i][k] and rule[1] in table[i + k + 1][j - k - 1]:
+                            if len(rule) > 0 and (rule[0] in table[i][k] and rule[1] in table[i + k + 1][j - k - 1]):
                                 table[i][j].add(variable)
 
         return starting_symbol in table[0][n - 1]
