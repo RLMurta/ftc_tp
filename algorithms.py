@@ -53,7 +53,7 @@ class ModifiedCyk:
         """
         input = input.replace(" ", "")
         starting_symbol = list(rules.keys())[0]
-        inverse_unit_graph = self.__inverse_unit_graph(rules)
+        inverse_unit_graph = self.__inverse_unit_graph(rules, input)
         n = len(input)
         table = [[set() for _ in range(n)] for i in range(n)]
         star_table = [[set() for _ in range(n)] for i in range(n)]
@@ -77,7 +77,7 @@ class ModifiedCyk:
                         table[i][j].append(b)
         return starting_symbol in table[0][n - 1]
     
-    def __inverse_unit_graph(self, rules):
+    def __inverse_unit_graph(self, rules, input):
         """
         Cria e retorna o grafo inverso das regras unitárias.
 
@@ -87,7 +87,13 @@ class ModifiedCyk:
         Returns:
             networkx.Graph: O grafo inverso das regras unitárias.
         """
+
         graph = nx.Graph()
+
+        # Adiciona todos os caracteres da entrada como nós no grafo
+        for char in input:
+            graph.add_node(char)
+
         for variable in rules:
             graph.add_node(variable)
         for variable in rules:

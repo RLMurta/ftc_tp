@@ -21,7 +21,7 @@ rules = cnf_file.rules.copy()
 # Converte para a Segunda Forma Normal
 second_normal_form_start_time = time.time()
 second_normal_form = SecondNormalForm().cfg_to_2nf(rules)
-#print(ModifiedCyk().run(second_normal_form, '(a0 + b) * a'))   #ta dando pau
+print(ModifiedCyk().run(second_normal_form, '(a0 + b) * a'))   #ta dando pau
 second_normal_form_total_time = time.time() - second_normal_form_start_time
 print(f'Second Normal Form: {second_normal_form}')
 
