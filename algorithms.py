@@ -1,107 +1,164 @@
-import networkx as nx
 import matplotlib.pyplot as plt
+import methods
 
 class Cyk:
-    def run(rules, input):
+    def run(gramatica, entrada):
         """
         Executa o algoritmo CYK para verificar se a gramática gera a entrada fornecida.
 
         Args:
-            rules (dict): As regras da gramática.
-            input (str): A entrada a ser verificada.
+            gramatica (dict): As regras da gramática.
+            entrada (str): A entrada a ser verificada.
 
         Returns:
             bool: True se a gramática gera a entrada, False caso contrário.
         """
-        input = input.replace(" ", "")
-        starting_symbol = list(rules.keys())[0]
-        n = len(input)
-        table = [[set() for _ in range(n - i)] for i in range(n)]
+        terminais = methods.findRulesRelatedToTerminals(gramatica)
+        vars = methods.findRulesRelatedToVariables(gramatica)
+
+        entrada = entrada.replace(" ", "")
+        n = len(entrada)
+        table = [[[] for _ in range(n)] for _ in range(n)]
 
         # Preenche a tabela para o primeiro caractere da entrada
-        for i in range(n):
-            for variable in rules:
-                for rule in rules[variable]:
-                    if input[i] in rule:
-                        table[i][0].add(variable)
+        for i in range(0, n):
+            terminal = entrada[i]
+            for rule in terminais:
+                if terminal in rule[1]:
+                    table[i][i].append(rule[0])
 
         # Preenche a tabela para os caracteres subsequentes
         for j in range(1, n):
-            for i in range(n - j):
-                for k in range(j):
-                    for variable in rules:
-                        for rule in rules[variable]:
-                            if len(rule) > 0 and (rule[0] in table[i][k] and rule[1] in table[i + k + 1][j - k - 1]):
-                                table[i][j].add(variable)
+            for i in range(j - 1, -1, -1):
+                for k in range(i, j):
+                    for rule in vars:
+                        if len(rule) > 0 and (rule[1][0] in table[i][k] and rule[1][1] in table[k + 1][j]):
+                            table[i][j].append(rule[0])
 
-        return starting_symbol in table[0][n - 1]
+        return gramatica.variables[0] in table[0][n - 1]
 
 class ModifiedCyk:
-    def __init__(self):
-        pass
-
-    def run(self, rules, input):
+    def run(gramatica, entrada, anulaveis):
         """
-        Executa o algoritmo CYK modificado para verificar se a gramática gera a entrada fornecida.
+        Executa o algoritmo CYK modificado para verificar se a gramática gera a entrada fornecida, levando em conta
+        símbolos nulos.
 
         Args:
-            rules (dict): As regras da gramática.
-            input (str): A entrada a ser verificada.
+            gramatica (dict): As regras da gramática.
+            entrada (str): A entrada a ser verificada.
+            anulaveis (set): Conjunto de símbolos nulos.
 
         Returns:
             bool: True se a gramática gera a entrada, False caso contrário.
         """
-        input = input.replace(" ", "")
-        starting_symbol = list(rules.keys())[0]
-        inverse_unit_graph = self.__inverse_unit_graph(rules, input)
-        n = len(input)
-        table = [[set() for _ in range(n)] for i in range(n)]
-        star_table = [[set() for _ in range(n)] for i in range(n)]
+        terminais = methods.findRulesRelatedToTerminals(gramatica)
+
+        entrada = entrada.replace(" ", "")
+        graph = ModifiedCyk.__inverse_unit_graph(gramatica, anulaveis)
+
+        n = len(entrada)
+        table = [[[] for _ in range(n)] for _ in range(n)]
+        star_table = [[[] for _ in range(n)] for _ in range(n)]
 
         # Preenche a tabela para substrings de comprimento 1
         for i in range(n):
-            table[i][i] = list(nx.dfs_edges(inverse_unit_graph, input[i]))
+            for rule in terminais:
+                reach = ModifiedCyk.discoverReach(graph, [entrada[i]])
+                table[i][i] = reach
 
-        # Preenche a tabela para substrings de comprimento maior que 1
-        for j in range(2, n):
-            for i in range(j-1,1,-1):
-                table[i][j] = list()
-                for h in range(i,j-1):
-                    for variable in rules:
-                        for rule in rules[variable]:
-                            if (len(rule) == 2 and (rule.islower() or rule.isalpha() is False)):
-                                if(rule[0] in table[i][h] and rule[1] in table[h+1][j]):
-                                    star_table[i][j].append(variable)
-                for a in star_table[i][j]:
-                    for b in list(nx.dfs_edges(inverse_unit_graph, a)):
-                        table[i][j].append(b)
-        return starting_symbol in table[0][n - 1]
-    
-    def __inverse_unit_graph(self, rules, input):
+            # Preenche a tabela para substrings de comprimento maior que 1
+            for j in range(1, n):
+                for i in range(j - 1, -1, -1):
+                    star_table[i][j].clear()
+                    for h in range(i, j):
+                        for rule in gramatica.rules:
+                            if len(rule[1]) >= 2:
+                                if(rule[1][0] in table[i][h] and rule[1][1] in table[h + 1][j]):
+                                    star_table[i][j].append(rule[0])
+
+                    table[i][j] = ModifiedCyk.discoverReach(graph, star_table[i][j])
+
+        return gramatica.variables[0] in table[0][n - 1]
+
+    def __inverse_unit_graph(gramatica, anulaveis):
         """
-        Cria e retorna o grafo inverso das regras unitárias.
+        Cria o grafo invertido para símbolos nulos.
 
         Args:
-            rules (dict): As regras da gramática.
+            gramatica (dict): As regras da gramática.
+            anulaveis (set): Conjunto de símbolos nulos.
 
         Returns:
-            networkx.Graph: O grafo inverso das regras unitárias.
+            dict: Grafo invertido.
         """
+        graph = {}
 
-        graph = nx.Graph()
+        for lhs, rhs in gramatica.rules:
+            if len(rhs) > 1:
+                if rhs[0] in anulaveis:
+                    if graph.get(rhs[1]) is None:
+                        graph[rhs[1]] = []
+                    graph[rhs[1]].append(lhs)
 
-        # Adiciona todos os caracteres da entrada como nós no grafo
-        for char in input:
-            graph.add_node(char)
+                if rhs[1] in anulaveis:
+                    if graph.get(rhs[0]) is None:
+                        graph[rhs[0]] = []
+                    graph[rhs[0]].append(lhs)
 
-        for variable in rules:
-            graph.add_node(variable)
-        for variable in rules:
-            for rule in rules[variable]:
-                if (len(rule) == 1 and (rule.islower() or rule.isalpha() is False)):
-                    graph.add_edge(variable, rule)
-                elif(len(rule) == 2 and (rule[0].islower() or rule[0].isalpha() is False)):
-                    graph.add_edge(rule[0], variable)
-                elif(len(rule) == 2 and (rule[1].islower() or rule[1].isalpha() is False)):
-                    graph.add_edge(rule[1], variable)
+            elif rhs[0] != 'ε':
+                if graph.get(rhs[0]) is None:
+                    graph[rhs[0]] = []
+                graph[rhs[0]].append(lhs)
+
         return graph
+
+    def discoverReach(graph, word_list):
+        """
+        Descobre os símbolos alcançáveis em um grafo a partir de uma lista de palavras.
+
+        Args:
+            graph (dict): Grafo a ser analisado.
+            word_list (list): Lista de palavras.
+
+        Returns:
+            list: Lista de símbolos alcançáveis.
+        """
+        canReach = set()
+        for node in word_list:
+            visited = ModifiedCyk.dfs(graph, node)
+            for i in range(0, len(visited)):
+                canReach.add(visited[i])
+
+        return list(canReach)
+
+    def dfs(graph, node):
+        """
+        Realiza uma busca em profundidade (DFS) em um grafo a partir de um nó.
+
+        Args:
+            graph (dict): Grafo a ser analisado.
+            node (str): Nó inicial.
+
+        Returns:
+            list: Lista de nós alcançáveis.
+        """
+        if graph.get(node) is None:
+            return [node]
+
+        visited = [node]
+        togo = [node]
+
+        for i in range(0, len(node)):
+            togo.append(graph[node][i])
+            visited.append(graph[node][i])
+
+        while len(togo) != 0:
+            next = togo.pop()
+            if graph.get(next) is not None:
+                for edge in range(0, len(graph[next])):
+                    vertex = graph[next][edge]
+                    if vertex not in visited:
+                        togo.append(vertex)
+                        visited.append(vertex)
+
+        return visited

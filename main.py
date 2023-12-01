@@ -1,30 +1,57 @@
-from read_file import ReadFile
-from normal_forms import ChomskyNormalForm, SecondNormalForm
+from normal_forms import Gramatica, cfgToCnf, cfgTo2nf
 from algorithms import Cyk, ModifiedCyk
 import methods
 import time
 
-# Carrega as regras do arquivo de gramática
-cnf_file = ReadFile('cfg_file.cnf')
-rules = methods.copy_dict(cnf_file.rules)
+filename = 'cfg_file'
 
-# Converte para a Forma Normal de Chomsky
+entrada = "ab"
+
+# Leitura da gramática a partir do arquivo
+grammar = Gramatica()
+grammar.readGramatica(filename)
+
+# Impressão da Forma Original da Gramatica
+print('Gramatica de entrada:')
+grammar.print()
+
+# Aplicação da Forma Normal de Chomsky
 chomsky_normal_form_start_time = time.time()
-chomsky_normal_form = ChomskyNormalForm().cfg_to_cnf(rules)
-print(Cyk.run(chomsky_normal_form, '(a0 + b) * a'))
+cfgToCnf(grammar)
 chomsky_normal_form_total_time = time.time() - chomsky_normal_form_start_time
-print(f'Chomsky Normal Form: {chomsky_normal_form}')
 
-# Restaura as regras originais para a próxima transformação
-rules = cnf_file.rules.copy()
+# Verificação se a entrada pertence à gramática usando o algoritmo CYK
+isPresent = Cyk.run(grammar, entrada)
 
-# Converte para a Segunda Forma Normal
+if isPresent:
+    print(f'Utilizando a Forma de Chomsky Normal a frase de entrada: "{entrada}" pertence à gramática')
+else:
+    print(f'Utilizando a Forma de Chomsky Normal a frase de entrada: "{entrada}" não pertence à gramática')
+
+# Impressão da Forma Normal de Chomsky
+print('Forma Normal de Chomsky:')
+grammar.print()
+
+# Reinicialização da gramática para aplicação da Segunda Forma Normal de Chomsky
+grammar = Gramatica()
+grammar.readGramatica(filename)
+
+# Aplicação da Segunda Forma Normal de Chomsky
 second_normal_form_start_time = time.time()
-second_normal_form = SecondNormalForm().cfg_to_2nf(rules)
-print(ModifiedCyk().run(second_normal_form, '(a0 + b) * a'))   #ta dando pau
+cfgTo2nf(grammar)
+anulaveis = methods.anulavel(grammar)
+isPresent = ModifiedCyk.run(grammar, entrada, anulaveis)
 second_normal_form_total_time = time.time() - second_normal_form_start_time
-print(f'Second Normal Form: {second_normal_form}')
 
-# Exibe os tempos de execução
-print('Chomsky Normal Form Time: ', round(chomsky_normal_form_total_time, 5))
-print('Second Normal Form Time: ', round(second_normal_form_total_time, 5))
+if isPresent:
+    print(f'Utilizando a Segunda Forma Normal de Chomsky a frase de entrada: "{entrada}" pertence à gramática')
+else:
+    print(f'Utilizando a Segunda Forma Normal de Chomsky a frase de entrada: "{entrada}" não pertence à gramática')
+
+# Impressão da Segunda Forma Normal de Chomsky
+print('Segunda Forma normal de Chomsky:')
+grammar.print()
+
+# Exibição dos tempos de execução
+print('Tempo de execução da Forma Normal de Chomsky:', round(chomsky_normal_form_total_time, 5))
+print('Tempo de execução da segunda Forma normal de Chomsky', round(second_normal_form_total_time, 5))
