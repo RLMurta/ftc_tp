@@ -5,15 +5,15 @@ import time
 
 filename = 'cfg_file'
 
-entrada = "ab"
+entrada = "abababababababababababababababab"
 
 # Leitura da gramática a partir do arquivo
 grammar = Gramatica()
 grammar.readGramatica(filename)
 
 # Impressão da Forma Original da Gramatica
-print('Gramatica de entrada:')
-grammar.print()
+# print('Gramatica de entrada:')
+# grammar.print()
 
 # Aplicação da Forma Normal de Chomsky
 cyk_start_time = time.time()
@@ -28,8 +28,8 @@ else:
     print(f'Utilizando a Forma de Chomsky Normal a frase de entrada: "{entrada}" não pertence à gramática')
 
 # Impressão da Forma Normal de Chomsky
-print('Forma Normal de Chomsky:')
-grammar.print()
+# print('Forma Normal de Chomsky:')
+# grammar.print()
 
 # Reinicialização da gramática para aplicação da Segunda Forma Normal de Chomsky
 grammar = Gramatica()
@@ -48,8 +48,8 @@ else:
     print(f'Utilizando a Segunda Forma Normal de Chomsky a frase de entrada: "{entrada}" não pertence à gramática')
 
 # Impressão da Segunda Forma Normal de Chomsky
-print('Segunda Forma normal de Chomsky:')
-grammar.print()
+# print('Segunda Forma normal de Chomsky:')
+# grammar.print()
 
 # Exibição dos tempos de execução
 print('Tempo de execução da Forma Normal de Chomsky:', round(cyk_total_time, 5))
