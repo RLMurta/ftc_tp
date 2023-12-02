@@ -5,7 +5,7 @@ import time
 
 filename = 'gramaticas/cfg_file_2'
 
-entrada = "(t)+t"
+entrada = "(t)"
 
 # Leitura da gramática a partir do arquivo
 grammar = Gramatica()
@@ -38,7 +38,6 @@ grammar2.readGramatica(filename)
 
 # Aplicação da Segunda Forma Normal de Chomsky
 second_normal_form_start_time = time.time()
-print("conversao 2 forma")
 cfgTo2nf(grammar2)
 anulaveis = methods.anulavel(grammar2)
 isPresent2 = ModifiedCyk.run(grammar2, entrada, anulaveis)

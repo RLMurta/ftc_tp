@@ -54,7 +54,7 @@ class ModifiedCyk:
         terminais = methods.findRulesRelatedToTerminals(gramatica)
 
         entrada = entrada.replace(" ", "")
-        graph = ModifiedCyk.__inverse_unit_graph(gramatica, anulaveis)
+        graph = ModifiedCyk.inverseUnitGraph(gramatica, anulaveis)
 
         n = len(entrada)
         table = [[[] for _ in range(n)] for _ in range(n)]
@@ -97,7 +97,7 @@ class ModifiedCyk:
                 print(table[j][j + i], end="\t")
             print()
 
-    def __inverse_unit_graph(gramatica, anulaveis):
+    def inverseUnitGraph(gramatica, anulaveis):
         """
         Cria o grafo invertido para símbolos nulos.
 
