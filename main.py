@@ -6,6 +6,7 @@ import time
 cyk_full_time = 0
 modified_cyk_full_time = 0
 count = 0
+output = open("output", "a")
 for i in range(1,6):
     count += 1
     filename = f'gramaticas/cfg_file_{i}'
@@ -21,6 +22,9 @@ for i in range(1,6):
     # Impressão da Forma Original da Gramatica
     print('Gramatica de entrada:')
     grammar.print()
+
+    output.write('-'*50 + '//' + '-'*50 + '\n')
+    output.write(f'Gramatica do arquivo: {filename} \n')
 
     entradas = open(f'inputs/input_file_{i}').read().splitlines()
     for i in entradas:
@@ -64,6 +68,11 @@ for i in range(1,6):
         # Exibição dos tempos de execução
         print('Tempo de execução CYK:', round(cyk_total_time, 5))
         print('Tempo de execução CYK Modificado', round(modified_cyk_total_time, 5))
+        output.write('*'*100+'\n')
+        output.write(f'entrada:{entrada} cyk:{round(cyk_total_time, 5)}s, modified_cyk:{round(modified_cyk_total_time, 5)}s\n')
     
 print('Media de tempo de execução CYK:', round(cyk_full_time/count, 5))
 print('Media de tempo de execução CYK Modificado', round(modified_cyk_full_time/count, 5))
+output.write('-'*100+'\n')
+output.write(f'| media cyk:{round(cyk_full_time/count, 5)}s, media modified_cyk:{round(modified_cyk_full_time/count, 5)}s |\n')
+output.write('-'*100+'\n')
