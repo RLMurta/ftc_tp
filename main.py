@@ -3,9 +3,9 @@ from algorithms import Cyk, ModifiedCyk
 import methods
 import time
 
-filename = 'cfg_file'
+filename = 'gramaticas/cfg_file_2'
 
-entrada = "ab"
+entrada = "(t)+t"
 
 # Leitura da gramática a partir do arquivo
 grammar = Gramatica()
@@ -33,24 +33,25 @@ print('Forma Normal de Chomsky:')
 grammar.print()
 
 # Reinicialização da gramática para aplicação da Segunda Forma Normal de Chomsky
-grammar = Gramatica()
-grammar.readGramatica(filename)
+grammar2 = Gramatica()
+grammar2.readGramatica(filename)
 
 # Aplicação da Segunda Forma Normal de Chomsky
 second_normal_form_start_time = time.time()
-cfgTo2nf(grammar)
-anulaveis = methods.anulavel(grammar)
-isPresent = ModifiedCyk.run(grammar, entrada, anulaveis)
+print("conversao 2 forma")
+cfgTo2nf(grammar2)
+anulaveis = methods.anulavel(grammar2)
+isPresent2 = ModifiedCyk.run(grammar2, entrada, anulaveis)
 second_normal_form_total_time = time.time() - second_normal_form_start_time
 
-if isPresent:
+if isPresent2:
     print(f'Utilizando a Segunda Forma Normal de Chomsky a frase de entrada: "{entrada}" pertence à gramática')
 else:
     print(f'Utilizando a Segunda Forma Normal de Chomsky a frase de entrada: "{entrada}" não pertence à gramática')
 
 # Impressão da Segunda Forma Normal de Chomsky
 print('Segunda Forma normal de Chomsky:')
-grammar.print()
+grammar2.print()
 
 # Exibição dos tempos de execução
 print('Tempo de execução da Forma Normal de Chomsky:', round(chomsky_normal_form_total_time, 5))

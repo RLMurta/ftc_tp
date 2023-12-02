@@ -1,0 +1,7 @@
+t + * ( )
+Variaveis:
+E
+Producoes:
+E -> E + E | E;
+E -> E * E | E;
+E -> ( E ) | t

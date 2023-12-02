@@ -1,0 +1,15 @@
+a b
+Variaveis:
+S A B C D E F G H I J
+Producoes:
+S -> A | B;
+A -> a E | ε;
+B -> a F | b I;
+C -> ε;
+D -> b J;
+E -> a E E | a F G | b C;
+F -> a E F | a F H | b D;
+G -> b;
+H -> b D;
+I -> a E F G | b;
+J -> a F H | b D

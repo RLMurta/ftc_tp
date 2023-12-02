@@ -61,24 +61,41 @@ class ModifiedCyk:
         star_table = [[[] for _ in range(n)] for _ in range(n)]
 
         # Preenche a tabela para substrings de comprimento 1
-        for i in range(n):
+        for i in range(0, n):
             for rule in terminais:
                 reach = ModifiedCyk.discoverReach(graph, [entrada[i]])
                 table[i][i] = reach
+        #print("tabela para substrings de comprimento 1")
+        #ModifiedCyk.print_cyk_table(table)
 
-            # Preenche a tabela para substrings de comprimento maior que 1
-            for j in range(1, n):
-                for i in range(j - 1, -1, -1):
-                    star_table[i][j].clear()
-                    for h in range(i, j):
-                        for rule in gramatica.rules:
-                            if len(rule[1]) >= 2:
-                                if(rule[1][0] in table[i][h] and rule[1][1] in table[h + 1][j]):
-                                    star_table[i][j].append(rule[0])
+        # Preenche a tabela para substrings de comprimento maior que 1
+        for j in range(1, n):
+            for i in range(j - 1, -1, -1):
+                for h in range(i, j):
+                    for rule in gramatica.rules:
+                        if len(rule[1]) >= 2:
+                            if(rule[1][0] in table[i][h] and rule[1][1] in table[h + 1][j]):
+                                star_table[i][j].append(rule[0])
 
-                    table[i][j] = ModifiedCyk.discoverReach(graph, star_table[i][j])
-
+                table[i][j] = ModifiedCyk.discoverReach(graph, star_table[i][j])
+            #print("# Preenche a tabela para substrings de comprimento maior que 1")
+            #ModifiedCyk.print_cyk_table(table)
         return gramatica.variables[0] in table[0][n - 1]
+    
+    def print_cyk_table(table):
+        """
+        Imprime a tabela CYK durante o preenchimento.
+
+        Args:
+            table (list): Tabela CYK preenchida.
+        """
+        n = len(table[0])
+
+        print("Tabela CYK:")
+        for i in range(n):
+            for j in range(n - i):
+                print(table[j][j + i], end="\t")
+            print()
 
     def __inverse_unit_graph(gramatica, anulaveis):
         """
@@ -96,17 +113,17 @@ class ModifiedCyk:
         for lhs, rhs in gramatica.rules:
             if len(rhs) > 1:
                 if rhs[0] in anulaveis:
-                    if graph.get(rhs[1]) is None:
+                    if (graph.get(rhs[1]) == None):
                         graph[rhs[1]] = []
                     graph[rhs[1]].append(lhs)
 
                 if rhs[1] in anulaveis:
-                    if graph.get(rhs[0]) is None:
+                    if (graph.get(rhs[0]) == None):
                         graph[rhs[0]] = []
                     graph[rhs[0]].append(lhs)
 
             elif rhs[0] != 'ε':
-                if graph.get(rhs[0]) is None:
+                if (graph.get(rhs[0]) == None):
                     graph[rhs[0]] = []
                 graph[rhs[0]].append(lhs)
 
@@ -128,6 +145,7 @@ class ModifiedCyk:
             visited = ModifiedCyk.dfs(graph, node)
             for i in range(0, len(visited)):
                 canReach.add(visited[i])
+        
 
         return list(canReach)
 
@@ -160,5 +178,4 @@ class ModifiedCyk:
                     if vertex not in visited:
                         togo.append(vertex)
                         visited.append(vertex)
-
         return visited
