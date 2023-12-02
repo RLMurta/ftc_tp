@@ -1,5 +1,6 @@
 0 1
 Variaveis:
-P
+P Z
 Producoes:
-P -> 0 P 0 | 1 P 1 | 0 | 1 | ε
+P -> 0 P 0 | 1 P 1 | 0 | 1 | Z;
+Z -> ε
