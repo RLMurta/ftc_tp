@@ -31,26 +31,39 @@ As variáveis e métodos foram nomeados de forma descritiva e seguindo as conven
 ## Instruções:
 A gramatica é lida diretamente do arquivo cfg_file, e o seguinte exemplo mostra o formato do arquivo:
 ```
-a b  #terminais
-Variables:
-S A B C D E F G H #Estados
-Productions: #Regras da Gramatica
+a b #terminais
+Variaveis: #variaveis
+S A B C D E F G H I J
+Producoes: #producoes
 S -> A | B;
 A -> a E | ε;
-B -> b F;
-D -> a | ε;
-E -> a E E | b F G | b;
-F -> b E F | a F H | a D;
-G -> b D;
-H -> a
+B -> a F | b I;
+C -> ε;
+D -> b J;
+E -> a E E | a F G | b C;
+F -> a E F | a F H | b D;
+G -> b;
+H -> b D;
+I -> a E F G | b;
+J -> a F H | b D
 ```
 
-Caso queira colocar uma frase de entrada é necessario editar a variavel entrada presente no main.py.
-Caso queira editar a gramatica de entrada é so editar o cfg_file seguindo o modelo acima como exemplo.
-O resultado é mostrado ao rodar o algoritmo diretamente no terminal
+Caso queira editar a gramática de entrada é só editar o cfg_file seguindo o modelo acima como exemplo.
 
-## Metodo de uso:
-- Execute main.py sem nenhum parametro
+Caso queira colocar uma frase de entrada é necessário editar o input_file_(numero) da gramatica especifica ctg_file_(numero), seguindo o exemplo abaixo:
+
+```
+aaabbb
+aaabbb
+aaaaaaaaaaaaaaabbbbbbbbbbbbbbbb
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbb
+ab
+```
+
+O resultado é mostrado ao rodar o algoritmo diretamente no terminal alem de ser gerado um arquivo relatando os resultados de cada gramatica e cada entrada com nome output
+
+## Método de uso:
+- Execute main.py sem nenhum parâmetro
 
 ```
 python3 main.py
@@ -58,6 +71,6 @@ python3 main.py
 ```
 
 Lembre-se de que:
-- Caso queira colocar uma frase de entrada é necessario editar a variavel entrada presente no main.py.
-- Caso queira editar a gramatica de entrada é so editar o cfg_file seguindo o modelo acima como exemplo.
-- O resultado é mostrado ao rodar o algoritmo diretamente no terminal
+- Caso queira editar a gramática de entrada é só editar o cfg_file seguindo o modelo passado como exemplo.
+- Caso queira colocar uma frase de entrada é necessário editar o input_file_(numero) da gramatica especifica ctg_file_(numero).
+- O resultado é mostrado ao rodar o algoritmo diretamente no terminal alem de ser gerado um arquivo output com as informaÇões.
